@@ -14,14 +14,19 @@ on:
         default: 'dev'
         required: false
         type: string
-      dockerhub_repo:
-        description: Docker Hub repository
-        default: 'otel/demo'
-        required: false
-        type: string
-      ghcr_repo:
-        description: GHCR repository
-        default: 'ghcr.io/open-telemetry/demo'
+      # dockerhub_repo:
+      #   description: Docker Hub repository
+      #   default: 'otel/demo'
+      #   required: false
+      #   type: string
+      # ghcr_repo:
+      #   description: GHCR repository
+      #   default: 'ghcr.io/open-telemetry/demo'
+      #   required: false
+      #   type: string
+      demo_repo:
+        description: The repo into which the images are pushed
+        default: '471112833028.dkr.ecr.us-east-1.amazonaws.com/demo'
         required: false
         type: string
 
@@ -31,6 +36,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Set up Chalk
+        uses: crashappsec/setup-chalk-action@main
       - name: Generate
         run: make clean docker-generate-protobuf
       - name: Check Clean Work Tree
@@ -200,9 +207,6 @@ jobs:
             OPENTELEMETRY_CPP_VERSION=${{ env.OPENTELEMETRY_CPP_VERSION }}
             TRACETEST_IMAGE_VERSION=${{ env.TRACETEST_IMAGE_VERSION }}
           tags: |
-            ${{ inputs.dockerhub_repo }}:${{ inputs.version }}-${{matrix.file_tag.tag_suffix }}
-            ${{ inputs.dockerhub_repo }}:latest-${{matrix.file_tag.tag_suffix }}
-            ${{ inputs.ghcr_repo }}:${{ inputs.version }}-${{ matrix.file_tag.tag_suffix }}
-            ${{ inputs.ghcr_repo }}:latest-${{ matrix.file_tag.tag_suffix }}
+            ${{ inputs.demo_repo }}:${{ inputs.version }}-${{ matrix.file_tag.tag_suffix }}
           cache-from: type=gha
           cache-to: type=gha

@@ -7,6 +7,12 @@ on:
     paths:
       - 'src/**'
       - 'test/**'
+  workflow_dispatch:
+    inputs:
+      observe:
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build_images:
