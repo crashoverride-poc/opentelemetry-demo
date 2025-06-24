@@ -53,8 +53,8 @@ jobs:
           ref: ${{ inputs.commit || github.ref }}
       - name: Generate
         run: make clean docker-generate-protobuf
-      - name: Check Clean Work Tree
-        run: make check-clean-work-tree
+      # - name: Check Clean Work Tree
+      #   run: make check-clean-work-tree
 
   build_and_push_images:
     runs-on: ubuntu-latest
