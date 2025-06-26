@@ -252,8 +252,8 @@ jobs:
             OPENTELEMETRY_CPP_VERSION=${{ env.OPENTELEMETRY_CPP_VERSION }}
             TRACETEST_IMAGE_VERSION=${{ env.TRACETEST_IMAGE_VERSION }}
           tags: |
-            ${{ secrets.AWS_ECR_PREFIX }}/demo:${{ inputs.version }}-${{matrix.file_tag.tag_suffix }}
-            ${{ secrets.AWS_ECR_PREFIX }}/demo:latest-${{matrix.file_tag.tag_suffix }}
+            ${{ secrets.AWS_ECR_PREFIX }}/demo/${{matrix.file_tag.tag_suffix }}:${{ inputs.version }}
+            ${{ secrets.AWS_ECR_PREFIX }}/demo/${{matrix.file_tag.tag_suffix }}:latest
           # ${{ inputs.dockerhub_repo }}:${{ inputs.version }}-${{matrix.file_tag.tag_suffix }}
           # ${{ inputs.dockerhub_repo }}:latest-${{matrix.file_tag.tag_suffix }}
           # ${{ inputs.ghcr_repo }}:${{ inputs.version }}-${{ matrix.file_tag.tag_suffix }}
