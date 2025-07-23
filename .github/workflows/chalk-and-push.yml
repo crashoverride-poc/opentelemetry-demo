@@ -1,5 +1,9 @@
+name: Build chalked image
+
 on:
   push:
+    branches:
+      - upstream
     paths:
       - "src/**"
       - "test/**"
