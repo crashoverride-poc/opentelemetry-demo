@@ -46,6 +46,11 @@ on:
         default: ""
         required: false
         type: string
+      branch:
+        description: Branch to checkout (defaults to current branch)
+        default: ""
+        required: false
+        type: string
 
 jobs:
   protobufcheck:
@@ -54,7 +59,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.commit || github.ref }}
+          ref: ${{ inputs.commit || inputs.branch || github.ref }}
       - name: Generate
         run: make clean docker-generate-protobuf
       # - name: Check Clean Work Tree
@@ -161,7 +166,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ inputs.commit || github.ref }}
+          ref: ${{ inputs.commit || inputs.branch || github.ref }}
 
       - name: Setup Chalk
         uses: crashappsec/setup-chalk-action@main
