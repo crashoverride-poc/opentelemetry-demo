@@ -63,6 +63,17 @@ jobs:
           docker buildx imagetools inspect --raw "$IMAGE" > manifest.json
 
           if [ -s manifest.json ]; then
+
+            #   batch-delete-image
+            # Deletes a list of specified images within a repository. Images are
+            # specified with either an imageTag or imageDigest .
+            # You can remove a tag from an image by specifying the image's tag in
+            # your request. When you remove the last tag from an image, the image is
+            # deleted from your repository.
+            aws ecr batch-delete-image \
+              --repository-name "demo/${{ matrix.service }}" \
+              --image-ids imageTag=prod || true
+
             # Apply prod tag
             aws ecr put-image \
               --repository-name "demo/${{ matrix.service }}" \
