@@ -5,9 +5,9 @@ permissions:
 
 on:
   schedule:
-    # Run every 3 hours
-    - cron: "0 */3 * * *"
-  workflow_dispatch: # Allow manual trigger
+    # Run every hour
+    - cron: "0 * * * *"
+  workflow_dispatch:
 
 jobs:
   sync:
@@ -36,12 +36,28 @@ jobs:
           git checkout upstream
           git rebase upstream/main
 
+      - name: Check for changes
+        id: check_changes
+        run: |
+          # Compare local HEAD with remote upstream branch
+          REMOTE_HEAD=$(git ls-remote origin upstream | awk '{print $1}')
+          LOCAL_HEAD=$(git rev-parse HEAD)
+
+          if [ "$REMOTE_HEAD" = "$LOCAL_HEAD" ]; then
+            echo "No changes to push"
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Changes detected"
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Push Changes
+        if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           git push https://${{ secrets.CI_PAT_TOKEN }}@github.com/${{ github.repository }}.git HEAD:upstream --force
 
       - name: Trigger Chalk and Push Workflow
-        if: success()
+        if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           curl -X POST \
             -H "Accept: application/vnd.github+json" \
