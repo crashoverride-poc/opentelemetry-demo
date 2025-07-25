@@ -130,7 +130,7 @@ jobs:
             context: ./
             setup-qemu: true
           - file: ./test/tracetesting/Dockerfile
-            tag_suffix: traceBasedTests
+            tag_suffix: tracebasedtests
             context: ./
             setup-qemu: true
 

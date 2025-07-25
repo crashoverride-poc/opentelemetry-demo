@@ -37,7 +37,7 @@ jobs:
           - recommendation
           - shipping
           - flagd-ui
-          - traceBasedTests
+          - tracebasedtests
 
     steps:
       - name: Set up Docker Buildx
