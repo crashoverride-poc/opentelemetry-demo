@@ -1,34 +1,6 @@
 name: Build chalked image
 
 on:
-  push:
-    branches:
-      - upstream
-    paths:
-      - "src/**"
-      - "test/**"
-    inputs:
-      push:
-        description: Should the images be pushed
-        default: false
-        required: false
-        type: boolean
-      version:
-        description: The version used when tagging the image
-        default: "dev"
-        required: false
-        type: string
-      dockerhub_repo:
-        description: Docker Hub repository
-        default: "otel/demo"
-        required: false
-        type: string
-      ghcr_repo:
-        description: GHCR repository
-        default: "ghcr.io/open-telemetry/demo"
-        required: false
-        type: string
-
   workflow_dispatch:
     inputs:
       push:
