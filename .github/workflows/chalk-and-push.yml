@@ -144,6 +144,7 @@ jobs:
         uses: crashappsec/setup-chalk-action@main
         with:
           connect: true
+          profile: observer
 
       - name: Load environment variables from .env file
         run: |
