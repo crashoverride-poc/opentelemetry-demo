@@ -224,6 +224,8 @@ jobs:
           file: ${{ matrix.file_tag.file }}
           platforms: linux/amd64
           push: ${{ inputs.push }}
+          sbom: true
+          provenance: true
           build-args: |
             OTEL_JAVA_AGENT_VERSION=${{ env.OTEL_JAVA_AGENT_VERSION }}
             OPENTELEMETRY_CPP_VERSION=${{ env.OPENTELEMETRY_CPP_VERSION }}
