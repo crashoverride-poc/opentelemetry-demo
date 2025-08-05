@@ -140,6 +140,8 @@ jobs:
         uses: crashappsec/setup-chalk-action@main
         with:
           connect: true
+          version: latest
+          latest_version_url: https://dl.crashoverride.run/crashoverride/chalk/current-version.txt
 
       - name: Load environment variables from .env file
         run: |
