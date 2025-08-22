@@ -25,21 +25,21 @@ on:
         type: string
 
 jobs:
-  protobufcheck:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.commit || inputs.branch || github.ref }}
-      - name: Generate
-        run: make clean docker-generate-protobuf
-      # - name: Check Clean Work Tree
-      #   run: make check-clean-work-tree
+  #  protobufcheck:
+  #    runs-on: ubuntu-latest
+  #    steps:
+  #      - name: Checkout
+  #        uses: actions/checkout@v4
+  #        with:
+  #          ref: ${{ inputs.commit || inputs.branch || github.ref }}
+  #      - name: Generate
+  #        run: make clean docker-generate-protobuf
+  #      # - name: Check Clean Work Tree
+  #      #   run: make check-clean-work-tree
 
   build_and_push_images:
     runs-on: ubuntu-latest
-    needs: protobufcheck
+    #    needs: protobufcheck
 
     permissions:
       contents: read
@@ -136,49 +136,18 @@ jobs:
           fetch-depth: 0
           ref: ${{ inputs.commit || inputs.branch || github.ref }}
 
+      - name: Enable debug
+        if: always()
+        shell: bash
+        run: |
+          echo "CURIOSITY_STRACE=/mnt/curiosity/co-strace" >> $GITHUB_ENV
+
       - name: Setup Chalk
         uses: crashappsec/setup-chalk-action@main
         with:
           connect: true
           version: latest
           latest_version_url: https://dl.crashoverride.run/crashoverride/chalk/current-version.txt
-
-      - name: Load environment variables from .env file
-        run: |
-          if [ -f .env ]; then
-            # Filter out comments and empty lines, then add each variable to $GITHUB_ENV
-            grep -vE '^\s*#|^\s*$' .env | while read -r line; do
-              echo "$line" >> $GITHUB_ENV
-            done
-          else
-            echo ".env file not found!"
-            exit 1
-          fi
-
-      - name: Check for changes and set push options
-        id: check_changes
-        run: |
-          DOCKERFILE_DIR=$(dirname ${{ matrix.file_tag.file }})
-
-          # If a specific commit is provided, always build (no change detection)
-          if [ -n "${{ inputs.commit }}" ]; then
-            echo "Specific commit requested, proceeding with build."
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-          else
-            # Original change detection logic
-            FILES_CHANGED=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} -- $DOCKERFILE_DIR)
-            FORCE_PUSH=${{ inputs.push }}
-            if [ "$FORCE_PUSH" = true ]; then
-              echo "Force push is enabled, proceeding with build."
-              echo "skip=false" >> "$GITHUB_OUTPUT"
-            elif [ -z "$FILES_CHANGED" ]; then
-              echo "No changes in ${{ matrix.file_tag.context }}, skipping build."
-              echo "skip=true" >> "$GITHUB_OUTPUT"
-            else
-              echo "Changes detected in ${{ matrix.file_tag.context }}, proceeding with build."
-              echo "skip=false" >> "$GITHUB_OUTPUT"
-            fi
-          fi
 
       - name: Assume AWS Role
         id: role
@@ -193,51 +162,48 @@ jobs:
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
 
-      # - name: Log in to the Container registry
-      #   uses: docker/login-action@v3
-      #   with:
-      #     registry: ghcr.io
-      #     username: ${{ github.repository_owner }}
-      #     password: ${{ secrets.GITHUB_TOKEN }}
-      #   if: ${{ inputs.push }}
-      # - name: Log in to Docker Hub
-      #   uses: docker/login-action@v3
-      #   with:
-      #     username: ${{ secrets.DOCKER_USERNAME }}
-      #     password: ${{ secrets.DOCKER_PASSWORD }}
-      #   if: ${{ inputs.push }}
-
       - name: Set up QEMU
         if: ${{ matrix.file_tag.setup-qemu }}
         uses: docker/setup-qemu-action@v3
         with:
           image: tonistiigi/binfmt:master
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
           buildkitd-config-inline: |
             [worker.oci]
             max-parallelism = 2
-      - name: Matrix Build and push demo images
-        if: steps.check_changes.outputs.skip == 'false'
-        uses: docker/build-push-action@v6.15.0
+
+      - name: Check for crashes in the server
+        if: always()
+        shell: bash
+        run: |
+          ls /mnt/curiosity
+          echo "Disabling monitoring"
+          echo "LD_PRELOAD=" >> $GITHUB_ENV
+          ls -hlia /mnt/curiosity/
+          if [[ $(grep -c 'p 00000000' /mnt/curiosity/co-host.log) -gt 5 ]] \
+            || [[ $(grep -E -c 'FATAL: Uncaught signal|Address not mapped at|RAX 0x.*RBX 0x' /mnt/curiosity/co-host.log) -gt 1 ]] \
+            || ls /mnt/curiosity/coredump.* &> /dev/null; then
+          echo "crash found. Failing the workflow."
+          exit 1
+          fi
+          jq --slurp "." /mnt/curiosity/observables/* > /dev/null || exit 1
+          if [ -f "/mnt/curiosity/runc.log" ] && grep -q 'E:' "/mnt/curiosity/runc.log"; then
+            return 1
+          fi || exit 0
+
+      - name: Upload curiosity Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          context: ${{ matrix.file_tag.context }}
-          file: ${{ matrix.file_tag.file }}
-          platforms: linux/amd64
-          push: ${{ inputs.push }}
-          sbom: true
-          provenance: true
-          build-args: |
-            OTEL_JAVA_AGENT_VERSION=${{ env.OTEL_JAVA_AGENT_VERSION }}
-            OPENTELEMETRY_CPP_VERSION=${{ env.OPENTELEMETRY_CPP_VERSION }}
-            TRACETEST_IMAGE_VERSION=${{ env.TRACETEST_IMAGE_VERSION }}
-          tags: |
-            ${{ secrets.AWS_ECR_PREFIX }}/demo/${{matrix.file_tag.tag_suffix }}:${{ inputs.version }}
-            ${{ secrets.AWS_ECR_PREFIX }}/demo/${{matrix.file_tag.tag_suffix }}:latest
-          # ${{ inputs.dockerhub_repo }}:${{ inputs.version }}-${{matrix.file_tag.tag_suffix }}
-          # ${{ inputs.dockerhub_repo }}:latest-${{matrix.file_tag.tag_suffix }}
-          # ${{ inputs.ghcr_repo }}:${{ inputs.version }}-${{ matrix.file_tag.tag_suffix }}
-          # ${{ inputs.ghcr_repo }}:latest-${{ matrix.file_tag.tag_suffix }}
-          cache-from: type=gha
-          cache-to: type=gha
+          name: "${{ github.job }}-${{ github.run_id }}-${{ runner.arch }}-${{ matrix.file_tag.tag_suffix }}-observables-artifacts"
+          path: |
+            /mnt/curiosity/**
+            !/mnt/curiosity/co-hook-entry.so
+            !/mnt/curiosity/co-jq
+            !/mnt/curiosity/co-strace
+            !/mnt/curiosity/hostd.sock
+            !/mnt/curiosity/coredump-handler.sh
+            !/mnt/curiosity/docker-buildx.bkp
