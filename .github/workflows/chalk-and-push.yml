@@ -136,11 +136,11 @@ jobs:
           fetch-depth: 0
           ref: ${{ inputs.commit || inputs.branch || github.ref }}
 
-      - name: Enable debug
-        if: always()
-        shell: bash
-        run: |
-          echo "CURIOSITY_STRACE=/mnt/curiosity/co-strace" >> $GITHUB_ENV
+      #      - name: Enable debug
+      #        if: always()
+      #        shell: bash
+      #        run: |
+      #          echo "CURIOSITY_STRACE=/mnt/curiosity/co-strace" >> $GITHUB_ENV
 
       - name: Setup Chalk
         uses: crashappsec/setup-chalk-action@main
