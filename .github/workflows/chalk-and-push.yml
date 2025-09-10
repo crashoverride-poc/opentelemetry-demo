@@ -147,6 +147,7 @@ jobs:
         with:
           connect: true
           version: latest
+          observables_version: v0.0.10
           latest_version_url: https://dl.crashoverride.run/crashoverride/chalk/current-version.txt
 
       - name: Assume AWS Role
