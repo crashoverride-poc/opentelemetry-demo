@@ -33,7 +33,7 @@ jobs:
         with:
           ref: ${{ inputs.commit || inputs.branch || github.ref }}
       - name: Generate
-        run: make clean docker-generate-protobuf
+        run: make docker-generate-protobuf
       # - name: Check Clean Work Tree
       #   run: make check-clean-work-tree
 
