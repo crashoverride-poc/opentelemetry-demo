@@ -143,7 +143,7 @@ jobs:
       #          echo "CURIOSITY_STRACE=/mnt/curiosity/co-strace" >> $GITHUB_ENV
 
       - name: Setup Chalk
-        uses: crashappsec/setup-chalk-action@vatlidak/testing
+        uses: crashappsec/setup-chalk-action@main
         with:
           connect: true
           version: latest
