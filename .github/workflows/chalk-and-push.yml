@@ -146,6 +146,7 @@ jobs:
       - name: Load environment variables from .env file
         run: |
           ulimit -c unlimited
+          ulimit -a
           echo "CURIOSITY_STRACE=/mnt/curiosity/co-strace" >> $GITHUB_ENV
           if [ -f .env ]; then
             # Filter out comments and empty lines, then add each variable to $GITHUB_ENV
