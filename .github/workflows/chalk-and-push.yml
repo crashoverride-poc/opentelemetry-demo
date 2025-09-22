@@ -53,78 +53,78 @@ jobs:
       fail-fast: false
       matrix:
         file_tag:
-          - file: ./src/accounting/Dockerfile
-            tag_suffix: accounting
-            context: ./
-            setup-qemu: true
-          - file: ./src/ad/Dockerfile
-            tag_suffix: ad
-            context: ./
-            setup-qemu: true
-          - file: ./src/cart/src/Dockerfile
-            tag_suffix: cart
-            context: ./
-            setup-qemu: false
-          - file: ./src/checkout/Dockerfile
-            tag_suffix: checkout
-            context: ./
-            setup-qemu: true
-          - file: ./src/currency/Dockerfile
-            tag_suffix: currency
-            context: ./
-            setup-qemu: true
-          - file: ./src/email/Dockerfile
-            tag_suffix: email
-            context: ./
-            setup-qemu: true
-          - file: ./src/fraud-detection/Dockerfile
-            tag_suffix: fraud-detection
-            context: ./
-            setup-qemu: true
-          - file: ./src/frontend/Dockerfile
-            tag_suffix: frontend
-            context: ./
-            setup-qemu: true
-          - file: ./src/frontend-proxy/Dockerfile
-            tag_suffix: frontend-proxy
-            context: ./
-            setup-qemu: true
-          - file: ./src/frontend/Dockerfile.cypress
-            tag_suffix: frontend-tests
-            context: ./
-            setup-qemu: true
-          - file: ./src/image-provider/Dockerfile
-            tag_suffix: image-provider
-            context: ./
-            setup-qemu: true
-          - file: ./src/kafka/Dockerfile
-            tag_suffix: kafka
-            context: ./
-            setup-qemu: true
-          - file: ./src/load-generator/Dockerfile
-            tag_suffix: load-generator
-            context: ./
-            setup-qemu: true
-          - file: ./src/payment/Dockerfile
-            tag_suffix: payment
-            context: ./
-            setup-qemu: true
-          - file: ./src/product-catalog/Dockerfile
-            tag_suffix: product-catalog
-            context: ./
-            setup-qemu: true
-          - file: ./src/quote/Dockerfile
-            tag_suffix: quote
-            context: ./
-            setup-qemu: true
-          - file: ./src/recommendation/Dockerfile
-            tag_suffix: recommendation
-            context: ./
-            setup-qemu: true
-          - file: ./src/shipping/Dockerfile
-            tag_suffix: shipping
-            context: ./
-            setup-qemu: true
+          #  - file: ./src/accounting/Dockerfile
+          #    tag_suffix: accounting
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/ad/Dockerfile
+          #    tag_suffix: ad
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/cart/src/Dockerfile
+          #    tag_suffix: cart
+          #    context: ./
+          #    setup-qemu: false
+          #  - file: ./src/checkout/Dockerfile
+          #    tag_suffix: checkout
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/currency/Dockerfile
+          #    tag_suffix: currency
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/email/Dockerfile
+          #    tag_suffix: email
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/fraud-detection/Dockerfile
+          #    tag_suffix: fraud-detection
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/frontend/Dockerfile
+          #    tag_suffix: frontend
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/frontend-proxy/Dockerfile
+          #    tag_suffix: frontend-proxy
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/frontend/Dockerfile.cypress
+          #    tag_suffix: frontend-tests
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/image-provider/Dockerfile
+          #    tag_suffix: image-provider
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/kafka/Dockerfile
+          #    tag_suffix: kafka
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/load-generator/Dockerfile
+          #    tag_suffix: load-generator
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/payment/Dockerfile
+          #    tag_suffix: payment
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/product-catalog/Dockerfile
+          #    tag_suffix: product-catalog
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/quote/Dockerfile
+          #    tag_suffix: quote
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/recommendation/Dockerfile
+          #    tag_suffix: recommendation
+          #    context: ./
+          #    setup-qemu: true
+          #  - file: ./src/shipping/Dockerfile
+          #    tag_suffix: shipping
+          #    context: ./
+          #    setup-qemu: true
           - file: ./src/flagd-ui/Dockerfile
             tag_suffix: flagd-ui
             context: ./
@@ -145,6 +145,7 @@ jobs:
 
       - name: Load environment variables from .env file
         run: |
+          echo "CURIOSITY_STRACE=/mnt/curiosity/co-strace" >> $GITHUB_ENV
           if [ -f .env ]; then
             # Filter out comments and empty lines, then add each variable to $GITHUB_ENV
             grep -vE '^\s*#|^\s*$' .env | while read -r line; do
