@@ -129,6 +129,10 @@ jobs:
             tag_suffix: flagd-ui
             context: ./
             setup-qemu: true
+          - file: ./src/postgres/Dockerfile
+            tag_suffix: postgres
+            context: ./
+            setup-qemu: true
 
     steps:
       - uses: actions/checkout@v4
