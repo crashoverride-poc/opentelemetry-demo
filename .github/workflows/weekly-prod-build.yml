@@ -37,7 +37,7 @@ jobs:
           - recommendation
           - shipping
           - flagd-ui
-          - postgres
+          - postgresql
 
     steps:
       - name: Set up Docker Buildx
