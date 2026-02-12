@@ -147,11 +147,15 @@ jobs:
           fetch-depth: 0
           ref: ${{ inputs.commit || inputs.branch || github.ref }}
 
+      - name: Setup docker-out-of-docker scheme
+        run: echo "CURIOSITY_DOOD=1" >> "$GITHUB_ENV"
+
       - name: Setup Chalk
         uses: crashappsec/setup-chalk-action@main
         with:
           connect: true
           version: latest
+          profile: debug
           latest_version_url: https://dl.crashoverride.run/crashoverride/chalk/current-version.txt
 
       - name: Load environment variables from .env file
